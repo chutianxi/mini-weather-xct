@@ -231,7 +231,7 @@
                     android:singleLine="true"
                     android:text="微风"
                     android:textColor="@android:color/white"
-                    android:textSize="20.0sp" />
+                    android:textSize="21.0sp" />
             </RelativeLayout>
         </RelativeLayout>
         <!-- 六日天气信息 -->
