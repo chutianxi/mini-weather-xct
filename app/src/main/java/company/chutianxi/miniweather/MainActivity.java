@@ -1,6 +1,7 @@
 package company.chutianxi.miniweather;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,12 +37,15 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,
             temperatureTv, climateTv, windTv, city_name_Tv;
     private ImageView weatherImg, pmImg;
+    private ImageView mCitySelect;
     private static final int UPDATE_TODAY_WEATHER = 1;
     private Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             switch (msg.what) {
                 case UPDATE_TODAY_WEATHER:
                     updateTodayWeather((TodayWeather) msg.obj);
+                    Toast.makeText(MainActivity.this,"更新成功！！！",Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     break;
@@ -53,6 +57,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_info);
         mUpdateBtn = findViewById(R.id.title_update_button);
+        mCitySelect = findViewById(R.id.title_city_manager);
+        mCitySelect.setOnClickListener(this);
         mUpdateBtn.setOnClickListener(this);
         initView();
     }
@@ -70,19 +76,33 @@ public class MainActivity extends Activity implements View.OnClickListener{
         windTv = (TextView) findViewById(R.id.wind);
         weatherImg = (ImageView) findViewById(R.id.weather_img);
 
-        city_name_Tv.setText("N/A");
-        cityTv.setText("N/A");
-        timeTv.setText("N/A");
-        humidityTv.setText("N/A");
-        pmDataTv.setText("N/A");
-        pmQualityTv.setText("N/A");
-        weekTv.setText("N/A");
-        temperatureTv.setText("N/A");
-        climateTv.setText("N/A");
-        windTv.setText("N/A");
+        SharedPreferences pref = getSharedPreferences("config",MODE_PRIVATE);
+        String responseStr =  pref.getString("responseStr","");
+        if (responseStr=="")
+        {
+            city_name_Tv.setText("N/A");
+            cityTv.setText("N/A");
+            timeTv.setText("N/A");
+            humidityTv.setText("N/A");
+            pmDataTv.setText("N/A");
+            pmQualityTv.setText("N/A");
+            weekTv.setText("N/A");
+            temperatureTv.setText("N/A");
+            climateTv.setText("N/A");
+            windTv.setText("N/A");
+        }else{
+            TodayWeather todayweather = parseXML(responseStr);
+            updateTodayWeather(todayweather);
+        }
     }
     @Override
     public void onClick(View view) {
+        if(view.getId() == R.id.title_city_manager)
+        {
+            Intent intent = new Intent(this,SelectCity.class);
+            //this.startActivity(intent);
+            this.startActivityForResult(intent,1);//requestCode为1
+        }
         if(view.getId() == R.id.title_update_button)
         {
             SharedPreferences pref = getSharedPreferences("config",MODE_PRIVATE);
@@ -90,12 +110,33 @@ public class MainActivity extends Activity implements View.OnClickListener{
             Log.d("myWeather",cityCode);
             if(NetUtil.getNetworkState(this)!=NetUtil.NETWORN_NONE)
             {
-                Toast.makeText(this,"网络正常",Toast.LENGTH_LONG);
+                Toast.makeText(this,"网络正常",Toast.LENGTH_SHORT).show();
                 queryWeatherCode(cityCode);
             }else
             {
-                Toast.makeText(this,"么有网络,请打开网络",Toast.LENGTH_LONG);
+                Toast.makeText(this,"么有网络,请打开网络",Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+    /**
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1&&resultCode==RESULT_OK)
+        {
+            String citycode = data.getStringExtra("citycode");
+            //Log.d("name", "onActivityResult: "+name);
+            //cityTv.setText(name);//cityTV仍然存在，因为main活动尚未出站，还持有他的引用
+            SharedPreferences pref = getSharedPreferences("config",MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putString("main_city_code",citycode);
+            editor.commit();
+            Toast.makeText(this,"已选择城市,请点击更新按钮",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -128,6 +169,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     }
                     String responseStr=response.toString();
                     Log.d("myWeather", responseStr);
+                    SharedPreferences pref = getSharedPreferences("config",MODE_PRIVATE);//每次更新将xml存入pref中
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("responseStr",responseStr);
+                    editor.commit();
                     todayWeather = parseXML(responseStr);
                     Log.d("todayweather", todayWeather.toString());
                     Message msg =new Message();
@@ -239,6 +284,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         temperatureTv.setText(todayWeather.getHigh()+"~"+todayWeather.getLow());
         climateTv.setText(todayWeather.getType());
         windTv.setText("风力:"+todayWeather.getFengli());
-        Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
     }
 }
