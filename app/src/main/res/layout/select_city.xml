@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <RelativeLayout
@@ -34,11 +35,26 @@
             android:gravity="center"
             />
     </RelativeLayout>
+    <company.chutianxi.view.ClearEditText
+        android:id="@+id/search_city"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:layout_below="@id/select_title"
+        android:hint="搜索全国城市（中文）"
+        android:background="@drawable/contact_search_box_edittext_keyword_background"
+        android:drawableLeft="@drawable/magnifying_glass"
+        android:drawablePadding="6.0dp"
+        android:singleLine="true"
+        android:textColor="#ff000000"
+        android:textColorHint="#ffcccccc"
+        android:textSize="20dp">
+    </company.chutianxi.view.ClearEditText>
     <ListView
         android:id="@+id/citylist"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@id/select_title"
+        android:layout_below="@id/search_city"
         >
     </ListView>
 </RelativeLayout>

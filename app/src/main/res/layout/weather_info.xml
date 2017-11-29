@@ -32,6 +32,13 @@
             android:text="北京天气"
             android:textSize="22.0sp"
             />
+        <ProgressBar
+            android:id="@+id/title_update_progess"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            style="@style/title_update_progressbar_style"
+            android:layout_alignParentRight="true"
+            />
         <ImageView
             android:id="@+id/title_update_button"
             android:layout_width="45.0dp"

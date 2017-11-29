@@ -26,6 +26,14 @@ public class CityAdapter extends BaseAdapter {
         this.citys = citys;
         this.context = context;
     }
+    public List<City> getCitys() {
+        return citys;
+    }
+
+    public void setCitys(List<City> citys) {
+        this.citys = citys;
+    }
+
     @Override
     public int getCount() {
         return citys.size();
